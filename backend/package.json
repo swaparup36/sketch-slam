@@ -4,7 +4,8 @@
   "description": "This is a clone of scribble.io but better than that",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node .\"dist\"index.js"
   },
   "author": "Swaparup Mukherjee",
   "license": "ISC",
