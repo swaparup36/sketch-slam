@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GetContext } from "../context/ContextProvider";
 import { Eraser, Undo2 } from "lucide-react";
 
@@ -45,7 +45,9 @@ function Game() {
     isChoosing,
     isGuessing,
     beginDraw,
+    beginDrawTouch,
     updateDraw,
+    updateDrawTouch,
     endDraw,
     clearCanvas,
     changeStrokeColor,
@@ -64,16 +66,20 @@ function Game() {
 
   useEffect(() => {
     startGame();
+
+    if(!canvasReference) return;
     const canvas = canvasReference.current;
     if (canvas) {
       canvas.width = 600;
       canvas.height = 400;
 
       const context = canvas.getContext("2d");
-      context.lineCap = "round";
-      context.strokeStyle = "black";
-      context.lineWidth = 4;
-      canvasContextReference.current = context;
+      if(context){
+        context.lineCap = "round";
+        context.strokeStyle = "black";
+        context.lineWidth = 4;
+        canvasContextReference.current = context;
+      }
     }
   }, []);
 
@@ -81,7 +87,7 @@ function Game() {
     <div>
       {isGameOver && (
         <p>
-          Winner is {winner.username} with score: {Math.floor(winner.score)}
+          Winner is {winner ? winner.username : ''} with score: {winner ? Math.floor(winner.score) : ""}
         </p>
       )}
       {!isGameOver && (
@@ -121,8 +127,8 @@ function Game() {
                 onMouseDown={beginDraw}
                 onMouseMove={updateDraw}
                 onMouseUp={endDraw}
-                onTouchStart={beginDraw}
-                onTouchMove={updateDraw}
+                onTouchStart={beginDrawTouch}
+                onTouchMove={updateDrawTouch}
                 onTouchEnd={endDraw}
                 className={`canvas ${isErasing ? 'cursor-eraser' : 'cursor-pencil'}`}
               />

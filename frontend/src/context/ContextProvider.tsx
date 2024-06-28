@@ -1,4 +1,8 @@
 import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  TouchEventHandler,
   createContext,
   useContext,
   useEffect,
@@ -8,28 +12,117 @@ import React, {
 import { useSocket } from "../hooks/useSocket";
 import { useNavigate } from "react-router-dom";
 
-interface winnerInterface {
+export interface winnerInterface {
   username: string;
   score: number;
 }
 
-interface allPlayersWithScoreInterface {
+export interface allPlayersWithScoreInterface {
   username: string;
   score: number;
 }
 
-interface allGuessesInterface {
+export interface allGuessesInterface {
   guess: string;
   correct: boolean;
 }
 
-const AppContext = createContext(null);
+type appContextProviderProps = {
+  children: ReactNode
+}
+
+export interface appContext {
+  players: string[],
+  setPlayers: Dispatch<SetStateAction<string[]>>,
+  wordlist: string[],
+  setWordList: Dispatch<SetStateAction<string[]>>,
+  round: number,
+  setRound: Dispatch<SetStateAction<number>>,
+  createNewGame: (userName: string) => void,
+  joinGame: (userName: string) => void,
+  guessWord: (guess: string) => void,
+  chooseWord: (word: string) => void,
+  roomCode: string,
+  setRoomCode: Dispatch<SetStateAction<string>>,
+  startGame: () => void,
+  score: number,
+  isGameOver: boolean,
+  winner: winnerInterface | null,
+  timerCount: number,
+  chooseTimerCount: number,
+  drawTimerCount: number,
+  isChoosing: boolean,
+  isGuessing: boolean,
+  beginDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void,
+  beginDrawTouch: (e: React.TouchEvent<HTMLCanvasElement>) => void,
+  updateDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void,
+  updateDrawTouch: TouchEventHandler<HTMLCanvasElement>,
+  endDraw: () => void,
+  clearCanvas: () => void,
+  changeStrokeColor: (color: string) => void
+  canvasContextReference: React.RefObject<CanvasRenderingContext2D>,
+  canvasReference: React.RefObject<HTMLCanvasElement>,
+  isDrawable: boolean,
+  allPlayersWithScore: allPlayersWithScoreInterface[],
+  allGuesses: allGuessesInterface[],
+  choosenWord: string,
+  hintWord: string,
+  eraseCanvas: () => void,
+  isErasing: boolean,
+  undoCanvas: () => void
+}
+
+export const useDefaultState = () => {
+  return {
+    players: [],
+    setPlayers: (players: string[]) => {},
+    wordlist: [],
+    setWordList: (wordlist: string[]) => {},
+    round: 0,
+    setRound: (round: number) => {},
+    createNewGame: (userName: string) => {},
+    joinGame: (userName: string) => {},
+    guessWord: (guess: string) => {},
+    chooseWord: (word: string) => {},
+    roomCode: "",
+    setRoomCode: (roomCode: string) => {},
+    startGame: () => {},
+    score: 0,
+    isGameOver: false,
+    winner: null,
+    timerCount: 180,
+    chooseTimerCount: 30,
+    drawTimerCount: 180,
+    isChoosing: false,
+    isGuessing: false,
+    beginDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {},
+    beginDrawTouch: (e: React.TouchEvent<HTMLCanvasElement>) => {},
+    updateDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {},
+    updateDrawTouch: (event) => {},
+    endDraw: () => {},
+    clearCanvas: () => {},
+    changeStrokeColor: (color: string) => {},
+    canvasContextReference: useRef<CanvasRenderingContext2D>(null),
+    canvasReference: useRef<HTMLCanvasElement>(null),
+    isDrawable: false,
+    allPlayersWithScore: [],
+    allGuesses: [],
+    choosenWord: "",
+    hintWord: "",
+    eraseCanvas: () => {},
+    isErasing: false,
+    undoCanvas: () => {}
+  } as appContext
+}
+
+
+const AppContext = createContext(useDefaultState);
 
 export const GetContext = () => {
   return useContext(AppContext);
 };
 
-const ContextProvider = (props) => {
+const ContextProvider = ({children}: appContextProviderProps) => {
   const socket = useSocket();
   const navigate = useNavigate();
 
@@ -46,8 +139,8 @@ const ContextProvider = (props) => {
   const [drawTimerCount, setDrawTimerCount] = useState<number>(180);
   const [isGuessing, setIsGuessing] = useState<boolean>(false);
   const [isChoosing, setIsChoosing] = useState<boolean>(false);
-  const canvasReference = useRef(null);
-  const canvasContextReference = useRef(null);
+  const canvasReference = useRef<HTMLCanvasElement>(null);
+  const canvasContextReference = useRef<CanvasRenderingContext2D>(null);
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [isDrawable, setIsDrawable] = useState<boolean>(false);
   const [allPlayersWithScore, setAllPlayersWithScore] = useState<allPlayersWithScoreInterface[]>([]);
@@ -59,12 +152,10 @@ const ContextProvider = (props) => {
   let times = -1;
   let chooseTimes = -1;
   let drawTimes = -1;
-  const [strokeWidth, setStrokeWidth] = useState<number>(4);
-  const [strokeColor, setStrokColor] = useState<string>("black");
-  const [prevStrokeColor, setPrevStrokColor] = useState<string>("black");
+  // const [strokeColor, setStrokColor] = useState<string>("black");
   const [canvasHistory, setCanvasHistory] = useState<string[]>([]);
 
-  const createNewGame = (userName: string) => {
+  const createNewGame = (userName: string): void => {
     if (!socket) {
       return;
     }
@@ -235,11 +326,13 @@ const ContextProvider = (props) => {
     }, 1000);
   };
 
-  const beginDraw = (e) => {
+  const beginDraw = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if(!isDrawable){
       return;
     }
-    // console.log("canvas is begining: ", e);
+
+    if(!canvasContextReference.current) return;
+
     canvasContextReference.current.beginPath();
     canvasContextReference.current.moveTo(
       e.nativeEvent.offsetX,
@@ -260,8 +353,37 @@ const ContextProvider = (props) => {
     );
   };
 
-  const beginDrawAuto = (offsetX, offsetY) => {
+  const beginDrawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if(!isDrawable){
+      return;
+    }
+
+    if(!canvasContextReference.current) return;
+
+    canvasContextReference.current.beginPath();
+    canvasContextReference.current.moveTo(
+      e.nativeEvent.touches[0].clientX-50,
+      e.nativeEvent.touches[0].clientY-300
+    );
+    setIsPressed(true);
+
+    socket?.send(
+      JSON.stringify({
+        type: "DRAW_BEGIN",
+        gameId:
+          window.location.pathname.split("/")[
+            window.location.pathname.split("/").length - 1
+          ],
+        offsetX: e.nativeEvent.touches[0].clientX-50,
+        offsetY: e.nativeEvent.touches[0].clientY-300
+      })
+    );
+  }
+
+  const beginDrawAuto = (offsetX: number, offsetY: number) => {
     console.log("begin offsets: ", offsetX, " ", offsetY);
+
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.beginPath();
     canvasContextReference.current.moveTo(offsetX, offsetY);
     setIsPressed(true);
@@ -271,7 +393,9 @@ const ContextProvider = (props) => {
     if(!isDrawable){
       return;
     }
-    // console.log("canvas is ending: ");
+
+    if(!canvasContextReference.current) return;
+
     canvasContextReference.current.closePath();
     setIsPressed(false);
 
@@ -292,11 +416,12 @@ const ContextProvider = (props) => {
   }
 
   const endDrawAuto = () => {
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.closePath();
     setIsPressed(false);
   };
 
-  const updateDraw = (e) => {
+  const updateDraw = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if(!isDrawable){
       return;
     }
@@ -305,7 +430,7 @@ const ContextProvider = (props) => {
       return;
     }
 
-    // console.log("canvas is updating: ", e);
+    if(!canvasContextReference.current) return;
 
     canvasContextReference.current.lineTo(
       e.nativeEvent.offsetX ? e.nativeEvent.offsetX : e.nativeEvent.touches[0].clientX-50,
@@ -326,7 +451,38 @@ const ContextProvider = (props) => {
     );
   };
 
-  const updateDrawAuto = (offsetX, offsetY) => {
+  const updateDrawTouch: React.TouchEventHandler<HTMLCanvasElement> = (e) => {
+    if(!isDrawable){
+      return;
+    }
+
+    if (!isPressed) {
+      return;
+    }
+
+    if(!canvasContextReference.current) return;
+
+    canvasContextReference.current.lineTo(
+      e.nativeEvent.touches[0].clientX-50,
+      e.nativeEvent.touches[0].clientY-300
+    );
+    canvasContextReference.current.stroke();
+    
+    socket?.send(
+      JSON.stringify({
+        type: "DRAW_UPDATE",
+        gameId:
+          window.location.pathname.split("/")[
+            window.location.pathname.split("/").length - 1
+          ],
+        offsetX: e.nativeEvent.offsetX ? e.nativeEvent.offsetX : e.nativeEvent.touches[0].clientX-50,
+        offsetY: e.nativeEvent.offsetY ? e.nativeEvent.offsetY : e.nativeEvent.touches[0].clientY-300
+      })
+    );
+  };
+
+  const updateDrawAuto = (offsetX: number, offsetY: number) => {
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.lineTo(offsetX, offsetY);
     canvasContextReference.current.stroke();
   };
@@ -337,7 +493,11 @@ const ContextProvider = (props) => {
     }
 
     const canvas = canvasReference.current;
+
+    if(!canvas) return;
     const context = canvas.getContext("2d");
+
+    if(!context) return;
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -351,6 +511,8 @@ const ContextProvider = (props) => {
       })
     );
     const canvasHis = canvasHistory;
+
+    if(!canvasReference.current) return;
     canvasHis.push(canvasReference.current.toDataURL());
     console.log(canvasHis);
     setCanvasHistory(canvasHis);
@@ -358,7 +520,11 @@ const ContextProvider = (props) => {
 
   const clearCanvasForced = () => {
     const canvas = canvasReference.current;
+
+    if(!canvas) return;
     const context = canvas.getContext("2d");
+
+    if(!context) return;
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -373,13 +539,19 @@ const ContextProvider = (props) => {
     );
 
     const canvasHis = canvasHistory;
+
+    if(!canvasReference.current) return;
     canvasHis.push(canvasReference.current.toDataURL());
     setCanvasHistory(canvasHis);
   }
 
   const clearCanvasAuto = () => {
     const canvas = canvasReference.current;
+
+    if(!canvas) return;
     const context = canvas.getContext("2d");
+
+    if(!context) return;
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
   };
@@ -388,9 +560,8 @@ const ContextProvider = (props) => {
     if(!isDrawable){
       return;
     }
-    setPrevStrokColor(strokeColor);
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.strokeStyle = color;
-    setStrokColor(color);
 
     socket?.send(
       JSON.stringify({
@@ -405,6 +576,7 @@ const ContextProvider = (props) => {
   };
 
   const changeStrokeColorAuto = (color: string) => {
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.strokeStyle = color;
   };
 
@@ -413,8 +585,8 @@ const ContextProvider = (props) => {
       return;
     }
 
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.strokeStyle = 'white';
-    setStrokColor('white');
     setIsErasing(true);
 
     socket?.send(
@@ -429,6 +601,7 @@ const ContextProvider = (props) => {
   }
 
   const eraseCanvasAuto = () => {
+    if(!canvasContextReference.current) return;
     canvasContextReference.current.strokeStyle = 'white';
   }
 
@@ -445,7 +618,9 @@ const ContextProvider = (props) => {
     
     image.onload = () => {
       const canvas = canvasReference.current;
+      if(!canvas) return;
       const context = canvas.getContext("2d");
+      if(!context) return;
       context.fillStyle = "white";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -472,7 +647,9 @@ const ContextProvider = (props) => {
     console.log("auto undo: ", imageURL);
     image.onload = () => {
       const canvas = canvasReference.current;
+      if(!canvas) return;
       const context = canvas.getContext("2d");
+      if(!context) return;
       context.fillStyle = "white";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -607,7 +784,9 @@ const ContextProvider = (props) => {
         isChoosing,
         isGuessing,
         beginDraw,
+        beginDrawTouch,
         updateDraw,
+        updateDrawTouch,
         endDraw,
         clearCanvas,
         changeStrokeColor,
@@ -623,7 +802,7 @@ const ContextProvider = (props) => {
         undoCanvas
       }}
     >
-      {props.children}
+      {children}
     </AppContext.Provider>
   );
 };

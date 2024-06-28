@@ -72,20 +72,16 @@ class Game {
                 resolve("time up");
             }, 180000);
             setInterval(() => {
-                if (this.playerGuessedCorrect === this.players.length - 1) {
+                let isSent = false;
+                if (this.playerGuessedCorrect === this.players.length - 1 && !isSent) {
                     resolve('all guessed correctly');
                     for (let p of this.players) {
                         p.send(JSON.stringify({
                             type: 'ALL_PLAYERS_GUESSED_CORRECTLY',
                             gameId: this.id
                         }));
-                        p.send(JSON.stringify({
-                            type: 'ADD_GUESS_TO_CHAT',
-                            gameId: this.id,
-                            guess: `${this.choosenWord} was the correct word`,
-                            correct: true
-                        }));
                     }
+                    isSent = true;
                 }
             }, 1000);
         });
@@ -163,6 +159,14 @@ class Game {
                     }
                     const response = yield this.waitForGuess();
                     console.log(response);
+                    for (let p of this.players) {
+                        p.send(JSON.stringify({
+                            type: 'ADD_GUESS_TO_CHAT',
+                            gameId: this.id,
+                            guess: `${this.choosenWord} was the correct word`,
+                            correct: true
+                        }));
+                    }
                 }
             }
             let winner = this.determineWinner();
