@@ -60,8 +60,8 @@ export interface appContext {
   endDraw: () => void,
   clearCanvas: () => void,
   changeStrokeColor: (color: string) => void
-  canvasContextReference: React.RefObject<CanvasRenderingContext2D>,
-  canvasReference: React.RefObject<HTMLCanvasElement>,
+  // canvasContextReference: React.RefObject<CanvasRenderingContext2D>,
+  canvasReference: React.RefObject<HTMLCanvasElement> | null,
   isDrawable: boolean,
   allPlayersWithScore: allPlayersWithScoreInterface[],
   allGuesses: allGuessesInterface[],
@@ -72,57 +72,104 @@ export interface appContext {
   undoCanvas: () => void
 }
 
-export const useDefaultState = () => {
-  return {
-    players: [],
-    setPlayers: (players: string[]) => {},
-    wordlist: [],
-    setWordList: (wordlist: string[]) => {},
-    round: 0,
-    setRound: (round: number) => {},
-    createNewGame: (userName: string) => {},
-    joinGame: (userName: string) => {},
-    guessWord: (guess: string) => {},
-    chooseWord: (word: string) => {},
-    roomCode: "",
-    setRoomCode: (roomCode: string) => {},
-    startGame: () => {},
-    score: 0,
-    isGameOver: false,
-    winner: null,
-    timerCount: 180,
-    chooseTimerCount: 30,
-    drawTimerCount: 180,
-    isChoosing: false,
-    isGuessing: false,
-    beginDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {},
-    beginDrawTouch: (e: React.TouchEvent<HTMLCanvasElement>) => {},
-    updateDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {},
-    updateDrawTouch: (event) => {},
-    endDraw: () => {},
-    clearCanvas: () => {},
-    changeStrokeColor: (color: string) => {},
-    canvasContextReference: useRef<CanvasRenderingContext2D>(null),
-    canvasReference: useRef<HTMLCanvasElement>(null),
-    isDrawable: false,
-    allPlayersWithScore: [],
-    allGuesses: [],
-    choosenWord: "",
-    hintWord: "",
-    eraseCanvas: () => {},
-    isErasing: false,
-    undoCanvas: () => {}
-  } as appContext
-}
+// export const useDefaultState = () => {
+//   return {
+//     players: [],
+//     setPlayers: (players: string[]) => {console.log(players)},
+//     wordlist: [],
+//     setWordList: (wordlist: string[]) => {console.log(wordlist)},
+//     round: 0,
+//     setRound: (round: number) => {console.log(round)},
+//     createNewGame: (userName: string) => {console.log(userName)},
+//     joinGame: (userName: string) => {console.log(userName)},
+//     guessWord: (guess: string) => {console.log(guess)},
+//     chooseWord: (word: string) => {console.log(word)},
+//     roomCode: "",
+//     setRoomCode: (roomCode: string) => {console.log(roomCode)},
+//     startGame: () => {},
+//     score: 0,
+//     isGameOver: false,
+//     winner: null,
+//     timerCount: 180,
+//     chooseTimerCount: 30,
+//     drawTimerCount: 180,
+//     isChoosing: false,
+//     isGuessing: false,
+//     beginDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {console.log(e)},
+//     beginDrawTouch: (e: React.TouchEvent<HTMLCanvasElement>) => {console.log(e)},
+//     updateDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {console.log(e)},
+//     updateDrawTouch: (event) => {console.log(event)},
+//     endDraw: () => {},
+//     clearCanvas: () => {},
+//     changeStrokeColor: (color: string) => {console.log(color)},
+//     // canvasContextReference: useRef<CanvasRenderingContext2D>(null),
+//     canvasReference: useRef<HTMLCanvasElement>(null),
+//     isDrawable: false,
+//     allPlayersWithScore: [],
+//     allGuesses: [],
+//     choosenWord: "",
+//     hintWord: "",
+//     eraseCanvas: () => {},
+//     isErasing: false,
+//     undoCanvas: () => {}
+//   } as appContext
+// }
+
+const defaultState = {
+  players: [],
+  setPlayers: (players: string[]) => {console.log(players)},
+  wordlist: [],
+  setWordList: (wordlist: string[]) => {console.log(wordlist)},
+  round: 0,
+  setRound: (round: number) => {console.log(round)},
+  createNewGame: (userName: string) => {console.log(userName)},
+  joinGame: (userName: string) => {console.log(userName)},
+  guessWord: (guess: string) => {console.log(guess)},
+  chooseWord: (word: string) => {console.log(word)},
+  roomCode: "",
+  setRoomCode: (roomCode: string) => {console.log(roomCode)},
+  startGame: () => {},
+  score: 0,
+  isGameOver: false,
+  winner: null,
+  timerCount: 180,
+  chooseTimerCount: 30,
+  drawTimerCount: 180,
+  isChoosing: false,
+  isGuessing: false,
+  beginDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {console.log(e)},
+  beginDrawTouch: (e: React.TouchEvent<HTMLCanvasElement>) => {console.log(e)},
+  updateDraw: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {console.log(e)},
+  updateDrawTouch: (event) => {console.log(event)},
+  endDraw: () => {},
+  clearCanvas: () => {},
+  changeStrokeColor: (color: string) => {console.log(color)},
+  // canvasContextReference: useRef<CanvasRenderingContext2D>(null),
+  canvasReference: null,
+  isDrawable: false,
+  allPlayersWithScore: [],
+  allGuesses: [],
+  choosenWord: "",
+  hintWord: "",
+  eraseCanvas: () => {},
+  isErasing: false,
+  undoCanvas: () => {}
+} as appContext
 
 
-const AppContext = createContext(useDefaultState);
+// export let AppContext = createContext(null);
+const AppContext = createContext(defaultState);
 
 export const GetContext = () => {
+  // const defaultState = useDefaultState();
+  // const context = createContext(defaultState);
   return useContext(AppContext);
 };
 
 const ContextProvider = ({children}: appContextProviderProps) => {
+  // const defaultState = useDefaultState();
+  // const AppContext = createContext(defaultState);
+
   const socket = useSocket();
   const navigate = useNavigate();
 
@@ -140,7 +187,7 @@ const ContextProvider = ({children}: appContextProviderProps) => {
   const [isGuessing, setIsGuessing] = useState<boolean>(false);
   const [isChoosing, setIsChoosing] = useState<boolean>(false);
   const canvasReference = useRef<HTMLCanvasElement>(null);
-  const canvasContextReference = useRef<CanvasRenderingContext2D>(null);
+  // const canvasContextReference = useRef<CanvasRenderingContext2D>(null);
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [isDrawable, setIsDrawable] = useState<boolean>(false);
   const [allPlayersWithScore, setAllPlayersWithScore] = useState<allPlayersWithScoreInterface[]>([]);
@@ -152,7 +199,7 @@ const ContextProvider = ({children}: appContextProviderProps) => {
   let times = -1;
   let chooseTimes = -1;
   let drawTimes = -1;
-  // const [strokeColor, setStrokColor] = useState<string>("black");
+  const [strokeColor, setStrokColor] = useState<string>("black");
   const [canvasHistory, setCanvasHistory] = useState<string[]>([]);
 
   const createNewGame = (userName: string): void => {
@@ -330,14 +377,32 @@ const ContextProvider = ({children}: appContextProviderProps) => {
     if(!isDrawable){
       return;
     }
+    
 
-    if(!canvasContextReference.current) return;
+    // if(!canvasContextReference.current) return;
 
-    canvasContextReference.current.beginPath();
-    canvasContextReference.current.moveTo(
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.beginPath();
+    // canvasContextReference.current.moveTo(
+    //   e.nativeEvent.offsetX,
+    //   e.nativeEvent.offsetY 
+    // );
+
+    context.beginPath();
+    context.moveTo(
       e.nativeEvent.offsetX,
       e.nativeEvent.offsetY 
     );
+
     setIsPressed(true);
 
     socket?.send(
@@ -358,10 +423,26 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       return;
     }
 
-    if(!canvasContextReference.current) return;
+    // if(!canvasContextReference.current) return;
 
-    canvasContextReference.current.beginPath();
-    canvasContextReference.current.moveTo(
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.beginPath();
+    // canvasContextReference.current.moveTo(
+    //   e.nativeEvent.touches[0].clientX-50,
+    //   e.nativeEvent.touches[0].clientY-300
+    // );
+
+    context.beginPath();
+    context.moveTo(
       e.nativeEvent.touches[0].clientX-50,
       e.nativeEvent.touches[0].clientY-300
     );
@@ -383,9 +464,23 @@ const ContextProvider = ({children}: appContextProviderProps) => {
   const beginDrawAuto = (offsetX: number, offsetY: number) => {
     console.log("begin offsets: ", offsetX, " ", offsetY);
 
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.beginPath();
-    canvasContextReference.current.moveTo(offsetX, offsetY);
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.beginPath();
+    // canvasContextReference.current.moveTo(offsetX, offsetY);
+
+    context.beginPath();
+    context.moveTo(offsetX, offsetY);
     setIsPressed(true);
   };
 
@@ -394,9 +489,20 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       return;
     }
 
-    if(!canvasContextReference.current) return;
+    // if(!canvasContextReference.current) return;
 
-    canvasContextReference.current.closePath();
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.closePath();
+    context.closePath();
     setIsPressed(false);
 
     socket?.send(
@@ -410,14 +516,28 @@ const ContextProvider = ({children}: appContextProviderProps) => {
     );
 
     const canvasHis = canvasHistory;
+    if(!canvasReference.current) return;
     canvasHis.push(canvasReference.current.toDataURL());
     console.log(canvasHis);
     setCanvasHistory(canvasHis);
   }
 
   const endDrawAuto = () => {
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.closePath();
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+    
+    // canvasContextReference.current.closePath();
+
+    context.closePath();
     setIsPressed(false);
   };
 
@@ -430,13 +550,29 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       return;
     }
 
-    if(!canvasContextReference.current) return;
+    // if(!canvasContextReference.current) return;
 
-    canvasContextReference.current.lineTo(
-      e.nativeEvent.offsetX ? e.nativeEvent.offsetX : e.nativeEvent.touches[0].clientX-50,
-      e.nativeEvent.offsetY ? e.nativeEvent.offsetY : e.nativeEvent.touches[0].clientY-300
-    );
-    canvasContextReference.current.stroke();
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.lineTo(
+    //   e.nativeEvent.offsetX,
+    //   e.nativeEvent.offsetY
+    // );
+    // canvasContextReference.current.stroke();
+
+    context.lineTo(
+      e.nativeEvent.offsetX,
+      e.nativeEvent.offsetY
+    )
+    context.stroke();
     
     socket?.send(
       JSON.stringify({
@@ -445,8 +581,8 @@ const ContextProvider = ({children}: appContextProviderProps) => {
           window.location.pathname.split("/")[
             window.location.pathname.split("/").length - 1
           ],
-        offsetX: e.nativeEvent.offsetX ? e.nativeEvent.offsetX : e.nativeEvent.touches[0].clientX-50,
-        offsetY: e.nativeEvent.offsetY ? e.nativeEvent.offsetY : e.nativeEvent.touches[0].clientY-300
+        offsetX: e.nativeEvent.offsetX,
+        offsetY: e.nativeEvent.offsetY
       })
     );
   };
@@ -460,13 +596,29 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       return;
     }
 
-    if(!canvasContextReference.current) return;
+    // if(!canvasContextReference.current) return;
 
-    canvasContextReference.current.lineTo(
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.lineTo(
+    //   e.nativeEvent.touches[0].clientX-50,
+    //   e.nativeEvent.touches[0].clientY-300
+    // );
+    // canvasContextReference.current.stroke();
+
+    context.lineTo(
       e.nativeEvent.touches[0].clientX-50,
       e.nativeEvent.touches[0].clientY-300
     );
-    canvasContextReference.current.stroke();
+    context.stroke();
     
     socket?.send(
       JSON.stringify({
@@ -475,16 +627,31 @@ const ContextProvider = ({children}: appContextProviderProps) => {
           window.location.pathname.split("/")[
             window.location.pathname.split("/").length - 1
           ],
-        offsetX: e.nativeEvent.offsetX ? e.nativeEvent.offsetX : e.nativeEvent.touches[0].clientX-50,
-        offsetY: e.nativeEvent.offsetY ? e.nativeEvent.offsetY : e.nativeEvent.touches[0].clientY-300
+        offsetX: e.nativeEvent.touches[0].clientX-50,
+        offsetY: e.nativeEvent.touches[0].clientY-300
       })
     );
   };
 
   const updateDrawAuto = (offsetX: number, offsetY: number) => {
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.lineTo(offsetX, offsetY);
-    canvasContextReference.current.stroke();
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = strokeColor;
+    context.lineWidth = 4;
+
+
+    // canvasContextReference.current.lineTo(offsetX, offsetY);
+    // canvasContextReference.current.stroke();
+
+    context.lineTo(offsetX, offsetY);
+    context.stroke();
   };
 
   const clearCanvas = () => {
@@ -560,8 +727,23 @@ const ContextProvider = ({children}: appContextProviderProps) => {
     if(!isDrawable){
       return;
     }
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.strokeStyle = color;
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = "black";
+    context.lineWidth = 4;
+
+
+    // canvasContextReference.current.strokeStyle = color;
+    context.strokeStyle = color;
+
+    setStrokColor(color);
 
     socket?.send(
       JSON.stringify({
@@ -576,8 +758,23 @@ const ContextProvider = ({children}: appContextProviderProps) => {
   };
 
   const changeStrokeColorAuto = (color: string) => {
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.strokeStyle = color;
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = "black";
+    context.lineWidth = 4;
+
+    // canvasContextReference.current.strokeStyle = color;
+
+    context.strokeStyle = color;
+
+    setStrokColor(color);
   };
 
   const eraseCanvas = () => {
@@ -585,8 +782,21 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       return;
     }
 
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.strokeStyle = 'white';
+    // if(!canvasContextReference.current) return;
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = "white";
+    context.lineWidth = 4;
+
+    setStrokColor("white");
+
+    // canvasContextReference.current.strokeStyle = 'white';
+
     setIsErasing(true);
 
     socket?.send(
@@ -601,8 +811,21 @@ const ContextProvider = ({children}: appContextProviderProps) => {
   }
 
   const eraseCanvasAuto = () => {
-    if(!canvasContextReference.current) return;
-    canvasContextReference.current.strokeStyle = 'white';
+    // if(!canvasContextReference.current) return;
+
+    const canvas = canvasReference.current;
+
+    if(!canvas) return;
+    const context = canvas.getContext("2d");
+     
+    if(!context) return;
+    context.lineCap = "round";
+    context.strokeStyle = "white";
+    context.lineWidth = 4;
+
+    setStrokColor("white");
+
+    // canvasContextReference.current.strokeStyle = 'white';
   }
 
   const undoCanvas = () => {
@@ -738,6 +961,8 @@ const ContextProvider = ({children}: appContextProviderProps) => {
       } else if(message.type === 'WORD_CHOOSEN_AUTOMATICALLY'){
         setWordList([]);
         setChoosenWord(message.choosenWord);
+        setIsChoosing(false);
+        chooseTimes = -1;
         StartDrawTimer();
         setIsDrawable(true);
       } else if(message.type === 'DRAW_ERASE'){
@@ -790,7 +1015,7 @@ const ContextProvider = ({children}: appContextProviderProps) => {
         endDraw,
         clearCanvas,
         changeStrokeColor,
-        canvasContextReference,
+        // canvasContextReference,
         canvasReference,
         isDrawable,
         allPlayersWithScore,

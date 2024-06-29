@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { GetContext } from "../context/ContextProvider";
+import { useContext, useEffect, useState } from "react";
+// import { GetContext } from "../context/ContextProvider";
 import { Eraser, Undo2 } from "lucide-react";
+import { GetContext } from "../context/ContextProvider";
 
 function Game() {
   const [guess, setGuess] = useState<string>("");
@@ -30,6 +31,7 @@ function Game() {
     'black'
   ];
 
+  // const context = useContext(AppContext);
   const context = GetContext();
   const {
     wordlist,
@@ -52,7 +54,7 @@ function Game() {
     clearCanvas,
     changeStrokeColor,
     canvasReference,
-    canvasContextReference,
+    // canvasContextReference,
     isDrawable,
     allPlayersWithScore,
     allGuesses,
@@ -78,7 +80,7 @@ function Game() {
         context.lineCap = "round";
         context.strokeStyle = "black";
         context.lineWidth = 4;
-        canvasContextReference.current = context;
+        // canvasContextReference.current = context;
       }
     }
   }, []);
