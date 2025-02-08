@@ -118,7 +118,7 @@ function Game() {
       if (window.innerWidth <= 768) { 
         // Mobile devices
         canvasWidth = 350;
-        canvasHeight = 200;
+        canvasHeight = 400;
         lineWidth = 1;
       } else if (window.innerWidth <= 1024) { 
         // Tablets
@@ -243,17 +243,17 @@ function Game() {
           {/* Header with Round and Timer */}
           <div className="flex justify-between items-center mb-4">
             <div className="bg-[#f3fae7] px-6 py-2 rounded-xl">
-              <span className="text-xl font-semibold">Round: {round + 1}</span>
+              <span className="md:text-xl font-semibold">Round: {round + 1}</span>
             </div>
             <div className="bg-[#f3fae7] px-6 py-2 rounded-xl">
-              <span className="text-xl font-mono font-semibold">
+              <span className="md:text-xl font-mono font-semibold">
                 {isGuessing && <MyTimer expiryTimestamp={new Date(new Date().setSeconds(new Date().getSeconds() + 180))} />}
                 {isChoosing && <MyTimer expiryTimestamp={new Date(new Date().setSeconds(new Date().getSeconds() + 30))} />}
                 {isDrawable && <MyTimer expiryTimestamp={new Date(new Date().setSeconds(new Date().getSeconds() + 180))} />}
               </span>
             </div>
             <div className="bg-[#f3fae7] px-6 py-2 rounded-xl">
-              <span className="text-xl font-semibold">Score: {score}</span>
+              <span className="md:text-xl font-semibold">Score: {score}</span>
             </div>
           </div>
 
@@ -271,7 +271,7 @@ function Game() {
                   onTouchMove={updateDrawTouch}
                   onTouchEnd={endDraw}
                   onClick={handleCanvasClick}
-                  className={`${isErasing ? 'cursor-cell' : isFilling ? 'cursor-pointer' : 'cursor-crosshair'} h-[55svh`}
+                  className={`${isErasing ? 'cursor-cell' : isFilling ? 'cursor-pointer' : 'cursor-crosshair'} `}
                 />
                 <div className="bg-[#f1fddc] p-4 flex items-center justify-between border-t-2 border-black">
                   <div className="flex gap-3">
@@ -362,7 +362,7 @@ function Game() {
                     <button
                       key={i}
                       onClick={() => chooseWord(word)}
-                      className="bg-white hover:bg-gray-50 px-8 py-3 rounded-xl transition-colors shadow-lg font-medium"
+                      className="bg-white hover:bg-gray-50 px-3 md:px-8 py-3 rounded-xl transition-colors shadow-lg md:font-medium"
                     >
                       {word}
                     </button>
@@ -386,7 +386,7 @@ function Game() {
               )}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 overflow-y-scroll">
               {/* Mobile Tabs - Only visible on mobile */}
               <div className="md:hidden bg-white rounded-3xl shadow-lg p-2">
                 <div className="grid grid-cols-2 gap-2">
@@ -465,7 +465,10 @@ function Game() {
                       className="w-full px-4 py-3 rounded-xl bg-[#f3fae7] border-2 border-transparent focus:border-[#d3e5b5] outline-none transition-colors"
                     />
                     <button
-                      onClick={() => guessWord(guess)}
+                      onClick={() => {
+                        guessWord(guess);
+                        setGuess('');
+                      }}
                       className="w-full bg-[#ABF600] text-black border-black hover:shadow-[0_6px_0px_0px_rgba(25,26,35,1)] transition-all duration-200 py-3 rounded-xl font-medium border-2"
                     >
                       Guess
@@ -515,7 +518,7 @@ function Game() {
                         </div>
                       ))}
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-3 fixed bottom-0 left-0 w-[90%] mb-2 mx-6 bg-white">
                       <input
                         type="text"
                         value={guess}
@@ -524,7 +527,10 @@ function Game() {
                         className="w-full px-4 py-3 rounded-xl bg-[#f3fae7] border-2 border-transparent focus:border-[#d3e5b5] outline-none transition-colors"
                       />
                       <button
-                        onClick={() => guessWord(guess)}
+                        onClick={() => {
+                          guessWord(guess);
+                          setGuess('');
+                        }}
                         className="w-full bg-[#ABF600] text-black border-black hover:shadow-[0_6px_0px_0px_rgba(25,26,35,1)] transition-all duration-200 py-3 rounded-xl font-medium border-2"
                       >
                         Guess

@@ -892,8 +892,6 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     }
 
 
-    // if(!canvasContextReference.current) return;
-
     const canvas = canvasReference.current;
 
     if (!canvas) return;
@@ -904,16 +902,11 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     context.strokeStyle = strokeColor;
     context.lineWidth = 4;
 
-    // canvasContextReference.current.beginPath();
-    // canvasContextReference.current.moveTo(
-    //   e.nativeEvent.touches[0].clientX-50,
-    //   e.nativeEvent.touches[0].clientY-300
-    // );
-
+    const rect = canvas.getBoundingClientRect();
     context.beginPath();
     context.moveTo(
-      e.nativeEvent.touches[0].clientX - 50,
-      e.nativeEvent.touches[0].clientY - 300
+      e.nativeEvent.touches[0].clientX - rect.left,
+      e.nativeEvent.touches[0].clientY - rect.top
     );
     setIsPressed(true);
 
@@ -924,16 +917,14 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
           window.location.pathname.split("/")[
             window.location.pathname.split("/").length - 1
           ],
-        offsetX: e.nativeEvent.touches[0].clientX - 50,
-        offsetY: e.nativeEvent.touches[0].clientY - 300,
+        offsetX: e.nativeEvent.touches[0].clientX - rect.left,
+        offsetY: e.nativeEvent.touches[0].clientY - rect.top,
       })
     );
   };
 
   const beginDrawAuto = (offsetX: number, offsetY: number) => {
     console.log("begin offsets: ", offsetX, " ", offsetY);
-
-    // if(!canvasContextReference.current) return;
 
     const canvas = canvasReference.current;
 
@@ -945,9 +936,6 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     context.lineCap = "round";
     context.strokeStyle = strokeColor;
     context.lineWidth = 4;
-
-    // canvasContextReference.current.beginPath();
-    // canvasContextReference.current.moveTo(offsetX, offsetY);
 
     context.beginPath();
     context.moveTo(offsetX, offsetY);
@@ -1063,8 +1051,6 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
       return;
     }
 
-    // if(!canvasContextReference.current) return;
-
     const canvas = canvasReference.current;
 
     if (!canvas) return;
@@ -1075,15 +1061,10 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     context.strokeStyle = strokeColor;
     context.lineWidth = 4;
 
-    // canvasContextReference.current.lineTo(
-    //   e.nativeEvent.touches[0].clientX-50,
-    //   e.nativeEvent.touches[0].clientY-300
-    // );
-    // canvasContextReference.current.stroke();
-
+    const rect = canvas.getBoundingClientRect();
     context.lineTo(
-      e.nativeEvent.touches[0].clientX - 50,
-      e.nativeEvent.touches[0].clientY - 300
+      e.nativeEvent.touches[0].clientX - rect.left,
+      e.nativeEvent.touches[0].clientY - rect.top
     );
     context.stroke();
 
@@ -1094,15 +1075,13 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
           window.location.pathname.split("/")[
             window.location.pathname.split("/").length - 1
           ],
-        offsetX: e.nativeEvent.touches[0].clientX - 50,
-        offsetY: e.nativeEvent.touches[0].clientY - 300,
+        offsetX: e.nativeEvent.touches[0].clientX - rect.left,
+        offsetY: e.nativeEvent.touches[0].clientY - rect.top,
       })
     );
   };
 
   const updateDrawAuto = (offsetX: number, offsetY: number) => {
-    // if(!canvasContextReference.current) return;
-
     const canvas = canvasReference.current;
 
     if (!canvas) return;
@@ -1112,9 +1091,6 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     context.lineCap = "round";
     context.strokeStyle = strokeColor;
     context.lineWidth = 4;
-
-    // canvasContextReference.current.lineTo(offsetX, offsetY);
-    // canvasContextReference.current.stroke();
 
     context.lineTo(offsetX, offsetY);
     context.stroke();
