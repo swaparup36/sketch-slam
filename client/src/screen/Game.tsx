@@ -469,7 +469,7 @@ function Game() {
                     />
                     <button
                       onClick={() => {
-                        guessWord(guess);
+                        guessWord(guess.toLowerCase());
                         setGuess('');
                       }}
                       className="w-full bg-[#ABF600] text-black border-black hover:shadow-[0_6px_0px_0px_rgba(25,26,35,1)] transition-all duration-200 py-3 rounded-xl font-medium border-2"
@@ -531,7 +531,7 @@ function Game() {
                       />
                       <button
                         onClick={() => {
-                          guessWord(guess);
+                          guessWord(guess.toLowerCase());
                           setGuess('');
                         }}
                         className="w-full bg-[#ABF600] text-black border-black hover:shadow-[0_6px_0px_0px_rgba(25,26,35,1)] transition-all duration-200 py-3 rounded-xl font-medium border-2"

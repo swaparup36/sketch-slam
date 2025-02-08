@@ -270,11 +270,12 @@ export class Game {
   }
 
   guessWord(socket: WebSocket, word: string, timeTaken: number) {
-    if (!this.guessOn) return;
-    if (this.players.indexOf(socket) === -1) return;
-    if (socket === this.choosenPlayer) return;
+    if (!this.guessOn) return console.log("guess is not on");
+    if (this.players.indexOf(socket) === -1) return console.log("player is not in game");
+    if (socket === this.choosenPlayer) return console.log("guess not allowed");
 
     if (word === this.choosenWord) {
+      console.log("correct guess");
       this.playerGuessedCorrect = this.playerGuessedCorrect + 1;
       socket.send(
         JSON.stringify({
@@ -303,7 +304,8 @@ export class Game {
           }));
         }
       }
-    }else{
+    } else {
+      console.log("incorrect guess");
       for(let p of this.players){
         if(p !== socket){
           p.send(JSON.stringify({

@@ -5,7 +5,7 @@ const wss = new WebSocketServer({ port: 8080 });
 wss.setMaxListeners(30);
 const gameManager = new GameManager();
 
-wss.on('connection', function connection(ws){
+wss.on('connection', function connection(ws) {
     console.log("a new user joined");
     ws.on('message', (data)=>{
         const msg = JSON.parse(data.toString());

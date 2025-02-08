@@ -363,6 +363,7 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
       correct: false,
     });
     setAllGuesses(allGuessesMade);
+    console.log("guess made by user");
     if(chatDivRef.current){
       chatDivRef.current.scrollTop = chatDivRef.current.scrollHeight;
     }
@@ -392,6 +393,7 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
     chooseTimes = -1;
     StartDrawTimer();
     setIsDrawable(true);
+    console.log("start drawing");
   };
 
   const replaceChar = (

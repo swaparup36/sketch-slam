@@ -4,7 +4,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const WS_URL = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:8080";
-// const WS_URL = "https://plankton-app-4aum5.ondigitalocean.app"
 
 export const useSocket = () => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
