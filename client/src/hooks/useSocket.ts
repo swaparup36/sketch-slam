@@ -1,6 +1,9 @@
 import {useEffect, useState} from 'react';
+import * as dotenv from "dotenv";
 
-const WS_URL = "ws://localhost:8080";
+dotenv.config();
+
+const WS_URL = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:8080";
 // const WS_URL = "https://plankton-app-4aum5.ondigitalocean.app"
 
 export const useSocket = () => {

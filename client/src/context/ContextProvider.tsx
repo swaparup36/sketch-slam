@@ -13,6 +13,9 @@ import { useSocket } from "../hooks/useSocket";
 import { useNavigate } from "react-router-dom";
 import { CreateRoomFormData, JoinRoomFormData, Player } from "../lib/types";
 import { colorsMatch, getColorAtPixel, hexToRgba, setColorAtPixel } from "../utils/fillShape";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 export interface winnerInterface {
   winner: Player;
@@ -283,7 +286,7 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
   const startGame = () => {
     if (!socket) {
       alert('Unable to get back the game state');
-      window.location.href = 'http://localhost:5173/';
+      window.location.href = import.meta.env.VITE_HOST_NAME;
       return console.log("socket is missing");
     }
     socket.send(
@@ -1311,7 +1314,7 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
         setChoosingPlayer(message.choosingPlayer);
         setIsAnotherChoosing(true);
       } else if(message.type === 'GAME_DOES_NOT_EXIST'){
-        window.location.href = 'http://localhost:5173/';
+        window.location.href = import.meta.env.VITE_HOST_NAME;
       } else {
         setRoomCode(message.game_id);
         navigate(`/lobby/${message.game_id}`);

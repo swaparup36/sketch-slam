@@ -6,6 +6,9 @@ import { generateLeaderboardImage } from "../utils/generateLeaderboard";
 import uploadImage from "../utils/uploader";
 import Modal from "../components/Modal";
 import { useModal } from "../hooks/useModal";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 
 function Game() {
@@ -64,7 +67,7 @@ function Game() {
 
   const handleBacktoHome = () => {
     deleteGame();
-    window.location.href = 'http://localhost:5173/';
+    window.location.href = import.meta.env.VITE_HOST_NAME;
   }
 
   const { isOpen, modalConfig, showModal, hideModal } = useModal();
