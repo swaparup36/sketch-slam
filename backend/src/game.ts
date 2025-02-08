@@ -124,8 +124,8 @@ export class Game {
         resolve("time up");
       }, 180000);
 
+      let isSent: boolean = false;
       setInterval(()=>{
-        let isSent: boolean = false;
         if (this.playerGuessedCorrect === this.players.length - 1 && !isSent){
           resolve('all guessed correctly');
           for(let p of this.players){

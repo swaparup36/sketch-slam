@@ -1204,6 +1204,7 @@ const ContextProvider = ({ children }: appContextProviderProps) => {
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      console.log(message);
       if (message.type === "GAME_STARTED_BY_OWNER") {
         console.log("game start navs");
         navigate(`/game/${message.gameId}`);
