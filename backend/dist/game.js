@@ -74,6 +74,7 @@ class Game {
             }, 30000); // 30 seconds timeout
             player.on("message", (data) => {
                 const msg = JSON.parse(data.toString());
+                console.log("Word choosen: ", msg.choosenWord);
                 if (msg.type === "WORD_CHOSEN") {
                     if (msg.gameId !== this.id)
                         return;
@@ -226,12 +227,13 @@ class Game {
     guessWord(socket, word, timeTaken) {
         var _a, _b;
         if (!this.guessOn)
-            return;
+            return console.log("guess is not on");
         if (this.players.indexOf(socket) === -1)
-            return;
+            return console.log("player is not in game");
         if (socket === this.choosenPlayer)
-            return;
+            return console.log("guess not allowed");
         if (word === this.choosenWord) {
+            console.log("correct guess");
             this.playerGuessedCorrect = this.playerGuessedCorrect + 1;
             socket.send(JSON.stringify({
                 type: 'CORRECT_GUESS',
@@ -259,6 +261,7 @@ class Game {
             }
         }
         else {
+            console.log("incorrect guess");
             for (let p of this.players) {
                 if (p !== socket) {
                     p.send(JSON.stringify({
