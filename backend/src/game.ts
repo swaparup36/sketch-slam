@@ -104,7 +104,7 @@ export class Game {
 
       player.on("message", (data) => {
         const msg = JSON.parse(data.toString());
-
+        console.log("Word choosen: ", msg.choosenWord);
         if (msg.type === "WORD_CHOSEN") {
           if (msg.gameId !== this.id) return;
           this.choosenWord = msg.choosenWord;
