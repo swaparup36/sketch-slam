@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws';
 import { GameManager } from './gameManager';
 
 const wss = new WebSocketServer({ port: 8080 });
-
+wss.setMaxListeners(30);
 const gameManager = new GameManager();
 
 wss.on('connection', function connection(ws){
