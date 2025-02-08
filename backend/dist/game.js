@@ -74,8 +74,8 @@ class Game {
             }, 30000); // 30 seconds timeout
             player.on("message", (data) => {
                 const msg = JSON.parse(data.toString());
-                console.log("Word choosen: ", msg.choosenWord);
                 if (msg.type === "WORD_CHOSEN") {
+                    console.log("Word choosen: ", msg.choosenWord);
                     if (msg.gameId !== this.id)
                         return;
                     this.choosenWord = msg.choosenWord;
@@ -93,8 +93,8 @@ class Game {
                 this.guessOn = false;
                 resolve("time up");
             }, 180000);
+            let isSent = false;
             setInterval(() => {
-                let isSent = false;
                 if (this.playerGuessedCorrect === this.players.length - 1 && !isSent) {
                     resolve('all guessed correctly');
                     for (let p of this.players) {
