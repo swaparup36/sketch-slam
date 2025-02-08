@@ -11,10 +11,10 @@ class GameManager {
         this.games = [];
         this.gameId = "";
     }
-    initiateGame(socket, username, rounds) {
+    initiateGame(socket, username, rounds, maxPlayers) {
         this.gameId = (0, generate_unique_id_1.default)({ length: 7 });
         console.log(this.gameId);
-        const game = new game_1.Game(this.gameId, username, socket, rounds);
+        const game = new game_1.Game(this.gameId, username, socket, rounds, maxPlayers);
         this.games.push(game);
         game.joinGame(socket, username);
         socket.send(JSON.stringify({
@@ -22,25 +22,53 @@ class GameManager {
         }));
     }
     handleJoinGame(socket, username, gameId) {
+        var _a;
         const requiredGame = this.games.find((game) => game.id === gameId);
         if (requiredGame) {
             requiredGame.joinGame(socket, username);
             let allPlayers = [];
             for (let player of requiredGame.players) {
-                let playerUsername = requiredGame === null || requiredGame === void 0 ? void 0 : requiredGame.playerToUsernameMap.get(player);
-                console.log("username: ", playerUsername);
-                allPlayers.push(playerUsername);
+                let playerUser = requiredGame === null || requiredGame === void 0 ? void 0 : requiredGame.playerToUserMap.get(player);
+                console.log("user: ", playerUser);
+                allPlayers.push(playerUser);
             }
             for (let player of requiredGame.players) {
                 player.send(JSON.stringify({
                     type: "GET_ALL_PLAYERS",
                     gameId: gameId,
                     players: allPlayers,
+                    creator: (_a = requiredGame.playerToUserMap.get(requiredGame.gameCreator)) === null || _a === void 0 ? void 0 : _a.username,
                 }));
             }
         }
         else {
             socket.send("Game does not exists");
+        }
+    }
+    handleChangeAvatar(socket, avatar, gameId) {
+        var _a;
+        const requiredGame = this.games.find((game) => game.id === gameId);
+        if (requiredGame) {
+            requiredGame.changeAvatar(socket, avatar);
+            let allPlayers = [];
+            for (let player of requiredGame.players) {
+                let playerUser = requiredGame === null || requiredGame === void 0 ? void 0 : requiredGame.playerToUserMap.get(player);
+                console.log("user: ", playerUser);
+                allPlayers.push(playerUser);
+            }
+            for (let player of requiredGame.players) {
+                player.send(JSON.stringify({
+                    type: "GET_ALL_PLAYERS",
+                    gameId: gameId,
+                    players: allPlayers,
+                    creator: (_a = requiredGame.playerToUserMap.get(requiredGame.gameCreator)) === null || _a === void 0 ? void 0 : _a.username,
+                }));
+            }
+        }
+        else {
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleLeaveGame(socket, gameId) {
@@ -49,7 +77,9 @@ class GameManager {
             requiredGame.leaveGame(socket);
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleStartGame(socket, gameId) {
@@ -58,7 +88,20 @@ class GameManager {
             requiredGame.startGame(socket);
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
+        }
+    }
+    handleDeleteGame(socket, gameId) {
+        const requiredGame = this.games.find((game) => game.id === gameId);
+        if (requiredGame) {
+            this.games = this.games.filter((game) => game.id !== gameId);
+        }
+        else {
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleGuessWord(socket, word, timeTaken, gameId) {
@@ -67,7 +110,9 @@ class GameManager {
             requiredGame.guessWord(socket, word, timeTaken);
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleDrawBegin(socket, gameId, offsetX, offsetY) {
@@ -85,7 +130,30 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
+        }
+    }
+    handleDrawFill(socket, gameId, clientX, clientY, color) {
+        const requiredGame = this.games.find((game) => game.id === gameId);
+        if (requiredGame) {
+            for (let player of requiredGame.players) {
+                if (player !== socket) {
+                    player.send(JSON.stringify({
+                        type: 'DRAW_FILL',
+                        gameId: gameId,
+                        clientX: clientX,
+                        clientY: clientY,
+                        color: color
+                    }));
+                }
+            }
+        }
+        else {
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleDrawUpdate(socket, gameId, offsetX, offsetY) {
@@ -103,7 +171,9 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleDrawEnd(socket, gameId) {
@@ -119,7 +189,9 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleDrawClear(socket, gameId) {
@@ -135,7 +207,9 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleDrawChangeColor(socket, gameId, color) {
@@ -152,7 +226,28 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
+        }
+    }
+    handleDrawChangeFillColor(socket, gameId, color) {
+        const requiredGame = this.games.find((game) => game.id === gameId);
+        if (requiredGame) {
+            for (let player of requiredGame.players) {
+                if (player !== socket) {
+                    player.send(JSON.stringify({
+                        type: 'DRAW_CHANGE_FILL_COLOR',
+                        gameId: gameId,
+                        color: color
+                    }));
+                }
+            }
+        }
+        else {
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleEraseCanvas(socket, gameId) {
@@ -168,7 +263,9 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
     handleUndoCanvas(socket, gameId, canvasurl) {
@@ -185,7 +282,9 @@ class GameManager {
             }
         }
         else {
-            socket.send("Game does not exists");
+            socket.send(JSON.stringify({
+                type: "GAME_DOES_NOT_EXIST",
+            }));
         }
     }
 }
